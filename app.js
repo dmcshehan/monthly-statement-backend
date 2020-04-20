@@ -2,6 +2,7 @@ var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
+var entryRoutes = require('./api/routes/entry');
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -10,6 +11,13 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 const url = `mongodb://${process.env.DB_USER}:${process.env.DB_PASS}@ds245512.mlab.com:45512/monthly_statement`;
+
+
+mongoose
+    .connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
+    .catch(error => {
+        console.log(error);
+    });
 
 
 app.use((req, res, next) => {
@@ -26,8 +34,7 @@ app.use((req, res, next) => {
     next();
 });
 
-app.get('/', function(req, res, next) {
-    res.json({
-        text: "hi"
-    })
-});
+app.use("/", entryRoutes);
+
+
+module.exports = app;
