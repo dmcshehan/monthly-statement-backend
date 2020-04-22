@@ -5,6 +5,10 @@ var entrySchema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         required: true
     },
+    uid: {
+        type: String,
+        required: true
+    },
     reason: {
         type: String,
         required: true
