@@ -13,8 +13,8 @@ router.get("/", userCheck, (req, res, next) => {
     var month = todaysDate.getMonth();
     var lastDate = new Date(year, month + 1, 0).getDate()
 
-    var firstDate = `${year}-${getCorrectMonth(month)}-01`;
-    var lastDate = `${year}-${getCorrectMonth(month)}-${lastDate}`;
+    var firstDate = `${year}-${getCorrectMonth(month)}-01T00:00:00.000Z`;
+    var lastDate = `${year}-${getCorrectMonth(month)}-${lastDate}T00:00:00.000Z`;
 
 
     Entry.find({ uid: req.body.uid, date: { $gte: firstDate, $lte: lastDate } })
@@ -36,9 +36,10 @@ router.get("/month/:yearMonth", userCheck, (req, res, next) => {
     var month = date.getMonth();
     var lastDate = new Date(year, month + 1, 0).getDate()
 
-    var firstDate = `${year}-${getCorrectMonth(month)}-01`;
-    var lastDate = `${year}-${getCorrectMonth(month)}-${lastDate}`;
+    var firstDate = `${year}-${getCorrectMonth(month)}-01T00:00:00.000Z`;
+    var lastDate = `${year}-${getCorrectMonth(month)}-${lastDate}T00:00:00.000Z`;
 
+    console.log(lastDate);
 
     Entry.find({ uid, date: { $gte: firstDate, $lte: lastDate } })
         .exec((error, entries) => {
@@ -51,6 +52,7 @@ router.get("/month/:yearMonth", userCheck, (req, res, next) => {
 });
 
 router.post("/", userCheck, (req, res, next) => {
+
     var entry = new Entry({
         _id: mongoose.Types.ObjectId(),
         ...req.body
