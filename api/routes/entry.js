@@ -39,7 +39,6 @@ router.get("/month/:yearMonth", userCheck, (req, res, next) => {
     var firstDate = `${year}-${getCorrectMonth(month)}-01T00:00:00.000Z`;
     var lastDate = `${year}-${getCorrectMonth(month)}-${lastDate}T00:00:00.000Z`;
 
-    console.log(lastDate);
 
     Entry.find({ uid, date: { $gte: firstDate, $lte: lastDate } })
         .exec((error, entries) => {
@@ -72,13 +71,16 @@ router.post("/", userCheck, (req, res, next) => {
 
 });
 
-// router.get("/", (req, res, next) => {
-//     console.log("Inside put");
+router.put("/", userCheck, (req, res, next) => {
 
-//     //Entry.findOne().exec((error, entry) => { });
-
-//     res.send({})
-// });
+    Entry.findOneAndUpdate({ _id: req.body._id, uid: req.body.uid }, req.body)
+        .then(entry => {
+            res.status(202).json({
+                message: "Entry Successfully Updated",
+                entry
+            });
+        })
+});
 
 router.delete("/:id", userCheck, (req, res, next) => {
     var uid = req.body.uid;
