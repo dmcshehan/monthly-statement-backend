@@ -10,21 +10,32 @@ const Entry = require('../models/entry');
 var getCorrectMonth = require('../helpers/getCorrectMonth');
 
 router.get('/', (req, res, next) => {
-	var autheticatedUser = res.locals.user;
+	var todaysDate = moment();
 
-	var startOfMonth = moment().startOf('month').format('YYYY-MM-DDTHH:mm:ss');
-	var endOfMonth = moment().endOf('month').format('YYYY-MM-DDTHH:mm:ss');
+	const startOfMonth = moment().startOf('month').format();
+	const endOfMonth = moment().endOf('month').format();
 
-	Entry.find({ uid: autheticatedUser.uid, date: { $gte: startOfMonth, $lte: endOfMonth } }).exec(
-		(error, entries) => {
-			if (error) {
-				//ERROR
-				next(error);
-			}
-			console.log(entries);
-			res.status(200).json(entries);
-		}
-	);
+	console.log(startOfMonth, endOfMonth);
+
+	// var year = todaysDate.getFullYear();
+	// var month = todaysDate.getMonth();
+
+	// var firstDate = `${year}-${getCorrectMonth(month)}-01T00:00:00.000Z`;
+	// var lastDate = `${year}-${getCorrectMonth(month)}-${lastDate}T00:00:00.000Z`;
+
+	// Entry.find({ uid: req.body.uid, date: { $gte: firstDate, $lte: lastDate } }).exec(
+	// 	(error, entries) => {
+	// 		if (error) {
+	// 			//ERROR
+	// 			console.log(error);
+	// 		}
+	// 		res.status(200).json(entries);
+	// 	}
+	// );
+
+	res.json({
+		cool: ':D',
+	});
 });
 
 router.get('/month/:yearMonth', (req, res, next) => {
