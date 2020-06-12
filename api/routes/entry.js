@@ -21,11 +21,52 @@ router.get('/', (req, res, next) => {
 				//ERROR
 				next(error);
 			}
-			console.log(entries);
 			res.status(200).json(entries);
 		}
 	);
 });
+
+router.post('/', (req, res, next) => {
+	var { uid } = res.locals.user;
+
+	var entry = new Entry({
+		_id: mongoose.Types.ObjectId(),
+		uid,
+		...req.body,
+		date: moment(req.body.daye).format('YYYY-MM-DDTHH:mm:ssZ'),
+	});
+
+	entry
+		.save()
+		.then((entry) => {
+			res.status(201).json({
+				message: 'Entry Successfully Added',
+				entry,
+			});
+		})
+		.catch((error) => {
+			//ERROR
+			next(error);
+		});
+});
+
+router.delete('/', (req, res, next) => {
+	var { uid } = res.locals.user;
+	var { entryId } = req.body;
+
+	Entry.deleteOne({ _id: entryId, uid }).exec((error, entry) => {
+		if (error) {
+			next(error);
+		}
+
+		res.status(202).json({
+			message: 'Entry Successfully Deleted',
+			entry,
+		});
+	});
+});
+
+//---- Done
 
 router.get('/month/:yearMonth', (req, res, next) => {
 	var uid = req.body.uid;
@@ -47,41 +88,10 @@ router.get('/month/:yearMonth', (req, res, next) => {
 	});
 });
 
-router.post('/', (req, res, next) => {
-	var entry = new Entry({
-		_id: mongoose.Types.ObjectId(),
-		...req.body,
-	});
-
-	entry
-		.save()
-		.then((entry) => {
-			res.status(201).json({
-				message: 'Entry Successfully Added',
-				entry,
-			});
-		})
-		.catch((error) => {
-			//ERROR
-			console.log(error);
-		});
-});
-
 router.put('/', (req, res, next) => {
 	Entry.findOneAndUpdate({ _id: req.body._id, uid: req.body.uid }, req.body).then((entry) => {
 		res.status(202).json({
 			message: 'Entry Successfully Updated',
-			entry,
-		});
-	});
-});
-
-router.delete('/:id', (req, res, next) => {
-	var uid = req.body.uid;
-
-	Entry.deleteOne({ _id: req.params.id, uid }).exec((error, entry) => {
-		res.status(200).json({
-			message: 'Entry Successfully Deleted',
 			entry,
 		});
 	});
