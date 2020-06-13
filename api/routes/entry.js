@@ -68,6 +68,20 @@ router.delete('/', (req, res, next) => {
 
 //---- Done
 
+router.put('/', (req, res, next) => {
+	var { uid } = res.locals.user;
+	var { _id } = req.body.updatedEntry;
+
+	console.log(uid, _id);
+
+	Entry.findOneAndUpdate({ _id, uid }, req.body.updatedEntry).then((entry) => {
+		res.status(204).json({
+			message: 'Entry Successfully Updated',
+			entry,
+		});
+	});
+});
+
 router.get('/month/:yearMonth', (req, res, next) => {
 	var uid = req.body.uid;
 	var date = new Date(req.params.yearMonth);
@@ -85,15 +99,6 @@ router.get('/month/:yearMonth', (req, res, next) => {
 			console.log(error);
 		}
 		res.status(200).json(entries);
-	});
-});
-
-router.put('/', (req, res, next) => {
-	Entry.findOneAndUpdate({ _id: req.body._id, uid: req.body.uid }, req.body).then((entry) => {
-		res.status(202).json({
-			message: 'Entry Successfully Updated',
-			entry,
-		});
 	});
 });
 
