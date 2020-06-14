@@ -66,8 +66,6 @@ router.delete('/', (req, res, next) => {
 	});
 });
 
-//---- Done
-
 router.put('/', (req, res, next) => {
 	var { uid } = res.locals.user;
 	var { _id } = req.body.updatedEntry;
@@ -82,21 +80,19 @@ router.put('/', (req, res, next) => {
 	});
 });
 
-router.get('/month/:yearMonth', (req, res, next) => {
-	var uid = req.body.uid;
-	var date = new Date(req.params.yearMonth);
+//---- Done
 
-	var year = date.getFullYear();
-	var month = date.getMonth();
-	var lastDate = new Date(year, month + 1, 0).getDate();
+router.get('/month', (req, res, next) => {
+	var { uid } = res.locals.user;
+	var { month } = req.query;
 
-	var firstDate = `${year}-${getCorrectMonth(month)}-01T00:00:00.000Z`;
-	var lastDate = `${year}-${getCorrectMonth(month)}-${lastDate}T00:00:00.000Z`;
+	var startOfMonth = moment(month).startOf('month').format('YYYY-MM-DDTHH:mm:ss');
+	var endOfMonth = moment(month).endOf('month').format('YYYY-MM-DDTHH:mm:ss');
 
-	Entry.find({ uid, date: { $gte: firstDate, $lte: lastDate } }).exec((error, entries) => {
+	Entry.find({ uid, date: { $gte: startOfMonth, $lte: endOfMonth } }).exec((error, entries) => {
 		if (error) {
 			//ERROR
-			console.log(error);
+			next(error);
 		}
 		res.status(200).json(entries);
 	});
