@@ -6,26 +6,6 @@ var moment = require('moment'); // require
 //models
 const Entry = require('../models/entry');
 
-//custom modules
-var getCorrectMonth = require('../helpers/getCorrectMonth');
-
-router.get('/', (req, res, next) => {
-	var autheticatedUser = res.locals.user;
-
-	var startOfMonth = moment().startOf('month').format('YYYY-MM-DDTHH:mm:ss');
-	var endOfMonth = moment().endOf('month').format('YYYY-MM-DDTHH:mm:ss');
-
-	Entry.find({ uid: autheticatedUser.uid, date: { $gte: startOfMonth, $lte: endOfMonth } }).exec(
-		(error, entries) => {
-			if (error) {
-				//ERROR
-				next(error);
-			}
-			res.status(200).json(entries);
-		}
-	);
-});
-
 router.post('/', (req, res, next) => {
 	var { uid } = res.locals.user;
 
@@ -33,13 +13,13 @@ router.post('/', (req, res, next) => {
 		_id: mongoose.Types.ObjectId(),
 		uid,
 		...req.body,
-		date: moment(req.body.daye).format('YYYY-MM-DDTHH:mm:ssZ'),
+		date: moment(req.body.date).format('YYYY-MM-DDTHH:mm:ssZ'),
 	});
 
 	entry
 		.save()
 		.then((entry) => {
-			res.status(201).json({
+			res.status(200).json({
 				message: 'Entry Successfully Added',
 				entry,
 			});
@@ -59,7 +39,7 @@ router.delete('/', (req, res, next) => {
 			next(error);
 		}
 
-		res.status(202).json({
+		res.status(200).json({
 			message: 'Entry Successfully Deleted',
 			entry,
 		});
@@ -70,10 +50,14 @@ router.put('/', (req, res, next) => {
 	var { uid } = res.locals.user;
 	var { _id } = req.body.updatedEntry;
 
-	console.log(uid, _id);
+	//next(new Error('Test Error!'));
 
-	Entry.findOneAndUpdate({ _id, uid }, req.body.updatedEntry).then((entry) => {
-		res.status(204).json({
+	Entry.findOneAndUpdate({ _id, uid }, req.body.updatedEntry).exec((error, entry) => {
+		if (error) {
+			next(error);
+		}
+
+		res.status(200).json({
 			message: 'Entry Successfully Updated',
 			entry,
 		});
@@ -82,7 +66,7 @@ router.put('/', (req, res, next) => {
 
 //---- Done
 
-router.get('/month', (req, res, next) => {
+router.get('/', (req, res, next) => {
 	var { uid } = res.locals.user;
 	var { month } = req.query;
 
@@ -94,7 +78,9 @@ router.get('/month', (req, res, next) => {
 			//ERROR
 			next(error);
 		}
-		res.status(200).json(entries);
+		res.status(200).json({
+			entries,
+		});
 	});
 });
 

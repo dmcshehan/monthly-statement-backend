@@ -27,12 +27,10 @@ app.use(firebaseMiddleware.auth);
 app.use('/', authCheck, entryRoutes);
 
 app.use(function errorHandler(err, req, res, next) {
-	console.log(err.message);
 	if (res.headersSent) {
 		return next(err);
 	}
-
-	res.status(500).send({ error: err });
+	res.status(500).send(err.message);
 });
 
 module.exports = app;
