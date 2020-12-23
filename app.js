@@ -1,11 +1,11 @@
-var express = require('express');
-var bodyParser = require('body-parser');
-var mongoose = require('mongoose');
-var entryRoutes = require('./api/routes/entry');
-var firebaseMiddleware = require('express-firebase-middleware');
-var cors = require('cors');
-var admin = require('./api/auth/firebaseAdmin'); //must have firebaseMiddleware to work properly
-var authCheck = require('./api/middleware/authCheck.js');
+var express = require("express");
+var bodyParser = require("body-parser");
+var mongoose = require("mongoose");
+var entryRoutes = require("./api/routes/entry");
+var firebaseMiddleware = require("express-firebase-middleware");
+var cors = require("cors");
+var admin = require("./api/auth/firebaseAdmin"); //must have firebaseMiddleware to work properly
+var authCheck = require("./api/middleware/authCheck.js");
 
 var app = express();
 
@@ -17,20 +17,33 @@ app.use(bodyParser.json());
 
 const url = `mongodb://${process.env.DB_USER}:${process.env.DB_PASS}@ds245512.mlab.com:45512/monthly_statement`;
 
-mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true }).catch((error) => {
-	console.log(error);
+mongoose
+  .connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
+  .catch((error) => {
+    console.log(error);
+  });
+
+app.use(function (req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Credentials", true);
+  res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin,X-Requested-With,Content-Type,Accept,content-type,application/json"
+  );
+  next();
 });
 
-app.use(cors());
+// app.use(cors());
 app.use(firebaseMiddleware.auth);
 
-app.use('/', authCheck, entryRoutes);
+app.use("/", authCheck, entryRoutes);
 
 app.use(function errorHandler(err, req, res, next) {
-	if (res.headersSent) {
-		return next(err);
-	}
-	res.status(500).send(err.message);
+  if (res.headersSent) {
+    return next(err);
+  }
+  res.status(500).send(err.message);
 });
 
 module.exports = app;
